@@ -1,14 +1,30 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
-  
-  const { session_id, distance } = req.body
+export async function POST(req) {
+  try {
+    const body = await req.json()
+    const { session_id, distance } = body
 
-  const { data, error } = await supabase.from('readings').insert([{ session_id, distance }])
+    const { data, error } = await supabase
+      .from('readings')
+      .insert([{ session_id, distance }])
 
-  if (error) return res.status(500).json({ error })
-  res.status(200).json({ success: true })
+    if (error) {
+      console.error('Supabase error:', error)
+      return new Response(JSON.stringify({ error }), { status: 500 })
+    }
+
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  } catch (err) {
+    console.error('Request error:', err)
+    return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 })
+  }
 }
