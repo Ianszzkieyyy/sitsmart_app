@@ -1,9 +1,9 @@
 services:
-  app:
-    build:
-      context: .
-    image: sitsmart_app
-    ports:
-      - 3000:3000
+  db:
+    image: postgres:17-alpine
     environment:
-      NODE_ENV: development
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sitsmart-db
+    ports:
+      - "5432:5432"
