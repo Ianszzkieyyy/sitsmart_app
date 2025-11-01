@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export async function POST(req: Request) {
   const { distance, user_id } = await req.json();
@@ -30,4 +30,22 @@ export async function POST(req: Request) {
   });
 
   return NextResponse.json({ success: true });
+}
+
+export async function GET(req: NextRequest) {
+  const sessionId = req.nextUrl.searchParams.get("session_id");
+
+  if (!sessionId) {
+    return NextResponse.json(
+      { success: false, message: "Session ID required" },
+      { status: 400 }
+    );
+  }
+
+  const readings = await prisma.reading.findMany({
+    where: { sessionId: parseInt(sessionId) },
+    orderBy: { timestamp: "asc" },
+  });
+
+  return NextResponse.json({ success: true, data: readings });
 }
