@@ -25,6 +25,8 @@ export async function POST(req: Request) {
       distance,
       userId: user_id,
       sessionId: activeSession.id,
+      isTooClose: distance < 10,
+      isNotSitting: distance > 80,
       timestamp: new Date(),
     },
   });

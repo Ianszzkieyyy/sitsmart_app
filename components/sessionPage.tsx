@@ -2,6 +2,9 @@
 
 import { Button } from "@/components/ui/button"
 import Timer from "./timer"
+import PostureAnalysis from "./postureAnalysis"
+
+
 import { useState, useEffect } from "react"
 
 export default function SessionPage() {
@@ -9,6 +12,7 @@ export default function SessionPage() {
     const [sessionId, setSessionId] = useState<number | null>(null)
     const [loading, setLoading] = useState(false)
     const [sessionData, setSessionData] = useState<any>(null)
+    const [latestReading, setLatestReading] = useState<any>(null)
     const [goalMinutes, setGoalMinutes] = useState<number>(60)
     const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null) 
     const userId = 1
@@ -16,8 +20,6 @@ export default function SessionPage() {
     useEffect(() => {
         checkActiveSession()
     }, [])
-
-
 
     useEffect(() => {
         if (!isSessionActive || !sessionId) return
@@ -28,7 +30,9 @@ export default function SessionPage() {
                 const data = await res.json()
                 if (data.success) {
                     setSessionData(data.data)
+                    setLatestReading(data.data[data.data.length - 1] || null)
                     console.log("Session Data:", data.data)
+                    console.log("Latest Reading:", data.data[data.data.length - 1] || null)
                 }
             } catch (error) {
                 console.error("Error fetching session data:", error)
@@ -37,7 +41,7 @@ export default function SessionPage() {
 
         fetchSessionData()
 
-        const interval = setInterval(fetchSessionData, 5000)
+        const interval = setInterval(fetchSessionData, 3000)
 
         return () => clearInterval(interval)
     }, [isSessionActive, sessionId])
@@ -113,6 +117,7 @@ export default function SessionPage() {
             <div className="flex flex-col justify-center items-center p-8">
                 <h1 className="font-bold text-4xl text-brand-gray mb-4">Session In Progress</h1>
                 {sessionStartTime && <Timer startTime={sessionStartTime} isActive={isSessionActive} />}
+                <PostureAnalysis sessionData={sessionData} isActive={isSessionActive} latestReading={latestReading} />
             </div>
             <Button className="bg-red-600 rounded-full hover:bg-red-700 m-8" disabled={loading} onClick={stopSession} size={"lg"}>
                 {loading ? "Stopping..." : "Stop Session"}

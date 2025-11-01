@@ -35,6 +35,8 @@ model Reading {
   userId     Int
   sessionId  Int?
   distance   Float
+  isTooClose Boolean?
+  isNotSitting Boolean?
   timestamp  DateTime  @default(now())
 
   user       User      @relation(fields: [userId], references: [id])
