@@ -60,7 +60,7 @@ export default function PostureAnalysis({ sessionData, isActive, latestReading }
             {loading ? (
                 <Spinner />
             ) : analysis ? (
-                <div className="flex flex-col">
+                <div className="flex flex-col justify-center items-center">
                     <h2 className="text-2xl font-bold mb-4 text-center text-brand-primary">Posture Analysis</h2>
                     {analysis.mostFrequent === "Good Posture" ? (
                         <p className="text-green-600 font-semibold text-center mb-2">✅ Keep up the good work! Your posture score is excellent!</p>

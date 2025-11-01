@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import Timer from "./timer"
 import PostureAnalysis from "./postureAnalysis"
+import DistanceGraph from "./distanceGraph";
 
 
 import { useState, useEffect } from "react"
@@ -113,15 +114,31 @@ export default function SessionPage() {
     };
 
     {return isSessionActive ? (
-        <div className="flex w-full bg-white rounded-xl ">
-            <div className="flex flex-col justify-center items-center p-8">
-                <h1 className="font-bold text-4xl text-brand-gray mb-4">Session In Progress</h1>
-                {sessionStartTime && <Timer startTime={sessionStartTime} isActive={isSessionActive} />}
-                <PostureAnalysis sessionData={sessionData} isActive={isSessionActive} latestReading={latestReading} />
+        <div className="w-full mt-16">
+            <div className="grid grid-cols-2 grid-rows-2 gap-4">
+                <div className="bg-white rounded-xl">
+                    <div className="flex flex-col justify-between items-center gap-8 p-8">
+                        <div className="flex flex-col gap-2">
+                            <h2 className="font-semibold text-lg text-brand-gray">Session In Progress</h2>
+                            <Button className="bg-red-600 rounded-full hover:bg-red-700" disabled={loading} onClick={stopSession} size={"sm"}>
+                                {loading ? "Stopping..." : "Stop Session"}
+                            </Button>
+                        </div>
+                        {sessionStartTime && <Timer startTime={sessionStartTime} isActive={isSessionActive} />}
+                    </div>
+                    
+                </div>
+                <div className="col-start-1 row-start-2 bg-white rounded-xl p-12">
+                    <div className="flex flex-col justify-center items-center">
+                        <PostureAnalysis isActive={isSessionActive} sessionData={sessionData} latestReading={latestReading} />
+                    </div>
+                </div>
+                <div className="row-span-2 col-start-2 row-start-1 bg-white rounded-xl">
+                    <div className="flex flex-col justify-between items-center p-4">
+                        {sessionStartTime && <DistanceGraph sessionData={sessionData} sessionStartTime={sessionStartTime} isActive={isSessionActive} />}
+                    </div>
+                </div>
             </div>
-            <Button className="bg-red-600 rounded-full hover:bg-red-700 m-8" disabled={loading} onClick={stopSession} size={"lg"}>
-                {loading ? "Stopping..." : "Stop Session"}
-            </Button>
         </div>
     ) : (
         <div className="flex w-full bg-white rounded-xl justify-center items-center p-32 mt-16">

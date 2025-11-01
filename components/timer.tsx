@@ -32,7 +32,7 @@ export default function Timer({ startTime, isActive }: TimerProps) {
     };
 
     return (
-      <div className="text-2xl font-bold text-brand-primary">
+      <div className="text-3xl font-bold text-brand-primary">
         Session Time: {formatTime(timer)}
       </div>
     );
