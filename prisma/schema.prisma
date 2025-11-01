@@ -24,8 +24,8 @@ model Session {
   endedAt        DateTime?
   focusedPerc    Float?    
   awayPerc       Float?      
-  postureScore   String?    
-
+  postureScore   String?
+  awayNotified   Boolean    @default(false)
   user           User      @relation(fields: [userId], references: [id])
   readings       Reading[]
 }

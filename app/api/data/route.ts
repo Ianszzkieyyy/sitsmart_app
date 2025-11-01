@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { NextResponse, NextRequest } from "next/server";
 
+import { sendEmail } from "@/lib/sendEmail";
+
 export async function POST(req: Request) {
   const { distance, user_id } = await req.json();
 
@@ -9,6 +11,9 @@ export async function POST(req: Request) {
     where: {
       userId: user_id,
       endedAt: null,
+    },
+    include: {
+      user: true,
     },
     orderBy: { startedAt: "desc" },
   });
@@ -30,6 +35,24 @@ export async function POST(req: Request) {
       timestamp: new Date(),
     },
   });
+
+  if (!activeSession.awayNotified) {
+    const recentReadings = await prisma.reading.findMany({
+      where: { sessionId: activeSession.id },
+      orderBy: { timestamp: "desc" },
+      take: 50,
+    })
+
+    if (recentReadings.length === 50 && recentReadings.every(r => r.isNotSitting)) {
+      if (activeSession.user.email) {
+        await sendEmail(activeSession.user.email, activeSession.user.name)
+        await prisma.session.update({
+          where: { id: activeSession.id },
+          data: { awayNotified: true },
+        })
+      }
+    }
+  }
 
   return NextResponse.json({ success: true });
 }
