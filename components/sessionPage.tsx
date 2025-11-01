@@ -5,8 +5,8 @@ import Timer from "./timer"
 import PostureAnalysis from "./postureAnalysis"
 import DistanceGraph from "./distanceGraph";
 
-
 import { useState, useEffect } from "react"
+import { useNotifications } from "@/hooks/useNotifications"
 
 export default function SessionPage() {
     const [isSessionActive, setIsSessionActive] = useState(false)
@@ -15,12 +15,20 @@ export default function SessionPage() {
     const [sessionData, setSessionData] = useState<any>(null)
     const [latestReading, setLatestReading] = useState<any>(null)
     const [goalMinutes, setGoalMinutes] = useState<number>(60)
-    const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null) 
+    const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null)
+
+    const { permission, requestPermission, showTooCloseNotification } = useNotifications()
     const userId = 1
 
     useEffect(() => {
         checkActiveSession()
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            })
+        }
     }, [])
+
 
     useEffect(() => {
         if (!isSessionActive || !sessionId) return
@@ -31,9 +39,14 @@ export default function SessionPage() {
                 const data = await res.json()
                 if (data.success) {
                     setSessionData(data.data)
-                    setLatestReading(data.data[data.data.length - 1] || null)
+                    const currentReading = data.data[data.data.length - 1] || null
+                    setLatestReading(currentReading)
+
+                    if (currentReading && currentReading.isTooClose) {
+                        showTooCloseNotification()
+                    }
                     console.log("Session Data:", data.data)
-                    console.log("Latest Reading:", data.data[data.data.length - 1] || null)
+                    console.log("Latest Reading:", currentReading)
                 }
             } catch (error) {
                 console.error("Error fetching session data:", error)
@@ -158,6 +171,9 @@ export default function SessionPage() {
         <div className="flex w-full bg-white rounded-xl justify-center items-center p-32 mt-16">
             <div className="flex flex-col gap-4 justify-center items-center">
                 <h1 className="font-bold text-4xl text-brand-gray">Want to Start a Session?</h1>
+                {permission !== 'granted' && (
+                    <Button onClick={requestPermission} size="sm">Enable Notifications</Button>
+                )}
                 <Button className="bg-brand-gray rounded-full hover:bg-brand-foreground" disabled={loading} onClick={startSession} size={"lg"}>
                     {loading ? "Starting..." : "Start Session"}
                 </Button>
