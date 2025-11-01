@@ -24,6 +24,10 @@ const chartConfig = {
     label: "Distance (cm)",
     color: "var(--chart-1)",
   },
+  time: {
+    label: "Time (s)",
+    color: "var(--chart-2)",
+  }
 } satisfies ChartConfig
 
 interface DistanceGraphProps {

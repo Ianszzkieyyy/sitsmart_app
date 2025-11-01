@@ -89,13 +89,27 @@ export default function SessionPage() {
 
     const stopSession = async () => {
         if (!sessionId) return
+
+        const focusedReadings = sessionData?.filter((reading: any) => reading.isTooClose === false && reading.isNotSitting === false).length || 0;
+        const totalReadings = sessionData?.length || 1;
+        const focusedPerc = (focusedReadings / totalReadings) * 100;
+
+        const awayReadings = sessionData?.filter((reading: any) => reading.isNotSitting === true).length || 0;
+        const awayPerc = (awayReadings / totalReadings) * 100;
+
+        const postureScore: string = focusedPerc > 80 ? "Good" : focusedPerc > 60 ? "Average" : "Poor";
         
         setLoading(true)
         try {
           const res = await fetch("/api/session/end", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ session_id: sessionId }),
+            body: JSON.stringify({ 
+                session_id: sessionId,
+                focusedPerc: focusedPerc,
+                awayPerc: awayPerc,
+                postureScore: postureScore,
+            }),
           });
 
           const data = await res.json();

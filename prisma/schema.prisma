@@ -22,9 +22,9 @@ model Session {
   goalMinutes    Int
   startedAt      DateTime  @default(now())
   endedAt        DateTime?
-  focusedSeconds Int       @default(0)
-  awaySeconds    Int       @default(0)
-  postureScore   Float?    // percentage of good posture
+  focusedPerc    Float?    
+  awayPerc       Float?      
+  postureScore   String?    
 
   user           User      @relation(fields: [userId], references: [id])
   readings       Reading[]
