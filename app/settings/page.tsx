@@ -276,7 +276,7 @@ export default function SettingsPage() {
                                 <span className="text-sm text-muted-foreground">cm</span>
                             </div>
                             <p id="too-close-helper" className="mt-1 text-sm text-muted-foreground">
-                                Recommended: between 8 cm and 20 cm depending on your setup.
+                                Recommended: between 5 cm and 30 cm depending on your setup.
                             </p>
                             {errors.isTooClose ? (
                                 <p
