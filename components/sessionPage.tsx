@@ -43,6 +43,7 @@ export default function SessionPage() {
                     setLatestReading(currentReading)
 
                     if (currentReading && currentReading.isTooClose) {
+                        console.log("Showing too close notification")
                         showTooCloseNotification()
                     }
                     console.log("Session Data:", data.data)

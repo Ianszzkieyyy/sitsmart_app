@@ -1,5 +1,7 @@
-export default function ProfilePage() {
+import ProfilePage from "@/components/profilePage"
+
+export default function ProfilePageWrapper() {
     return (
-        <h1>Profile Page</h1>
+        <ProfilePage />
     )
 }

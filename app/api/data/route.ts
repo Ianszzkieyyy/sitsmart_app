@@ -3,8 +3,36 @@ import { NextResponse, NextRequest } from "next/server";
 
 import { sendEmail } from "@/lib/sendEmail";
 
+const DEFAULT_THRESHOLDS = {
+  isTooClose: 10,
+  isNotSitting: 80,
+};
+
+async function getThresholdsForUser(userId: number) {
+  const settings = await prisma.userSettings.findUnique({ where: { userId } });
+
+  return {
+    isTooClose: settings?.isTooClose ?? DEFAULT_THRESHOLDS.isTooClose,
+    isNotSitting: settings?.isNotSitting ?? DEFAULT_THRESHOLDS.isNotSitting,
+  };
+}
+
 export async function POST(req: Request) {
-  const { distance, user_id } = await req.json();
+  const { distance, user_id, thresholds } = await req.json();
+
+  if (typeof user_id !== "number" || Number.isNaN(user_id)) {
+    return NextResponse.json(
+      { success: false, message: "A valid user_id is required" },
+      { status: 400 }
+    );
+  }
+
+  const storedThresholds = await getThresholdsForUser(user_id);
+
+  const tooCloseThreshold =
+    thresholds?.isTooClose ?? storedThresholds.isTooClose;
+  const notSittingThreshold =
+    thresholds?.isNotSitting ?? storedThresholds.isNotSitting;
 
   // Check if user has an active session
   const activeSession = await prisma.session.findFirst({
@@ -30,8 +58,8 @@ export async function POST(req: Request) {
       distance,
       userId: user_id,
       sessionId: activeSession.id,
-      isTooClose: distance < 10,
-      isNotSitting: distance > 80,
+      isTooClose: distance < tooCloseThreshold,
+      isNotSitting: distance > notSittingThreshold,
       timestamp: new Date(),
     },
   });

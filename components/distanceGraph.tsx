@@ -1,6 +1,6 @@
 "use client"
 
-import { CartesianGrid, Line, LineChart, XAxis } from "recharts"
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -45,7 +45,7 @@ export default function DistanceGraph({ sessionData, isActive, sessionStartTime 
         }
 
         const newData = sessionData.map((reading: any) => ({
-            time: reading.time,
+            time: reading.timestamp,
             distance: reading.distance,
         }))
 
@@ -74,11 +74,15 @@ export default function DistanceGraph({ sessionData, isActive, sessionStartTime 
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => {
+                const date = new Date(value);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+              }}
             />
+            <YAxis dataKey="distance" domain={['dataMin - 5', 'dataMax + 5']} />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent indicator="line" />}
             />
             <Line
               dataKey="distance"
